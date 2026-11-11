@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Informe · Manipulación del DOM y Eventos</title><link rel="stylesheet" href="../assets/site.css"></head><body><header class="hero"><div class="wrap"><a href="../index.html">← Todas las guías</a><p>TEMA 04 · PRÁCTICA RESUELTA</p><h1>Manipulación del DOM y Eventos</h1><div class="backlinks"><a href="informe.html">Desarrollo y conclusiones</a><a href="../guias/guia-4.pdf">Guía original (PDF)</a></div></div></header><main class="wrap"><a class="button" href="index.html">Abrir ejercicio resuelto</a><section class="panel"><h2>I. Datos y registros de la práctica</h2><p>Se programaron los elementos indicados en la guía. La tabla describe la implementación y los casos de comprobación; las pruebas de navegador efectivamente realizadas se documentan en VERIFICACION.txt.</p><div class="scroll"><table><thead><tr><th>Elemento o caso</th><th>Implementación o entrada</th><th>Comportamiento previsto</th></tr></thead><tbody><tr><td>Entrada vacía</td><td>Texto compuesto solo por espacios.</td><td>No se crea ningún elemento li.</td></tr><tr><td>Agregar tareas</td><td>Estudiar HTML; practicar JavaScript.</td><td>Dos li independientes, cada uno con Eliminar.</td></tr><tr><td>Eliminar tarea</td><td>Eliminar la primera tarea.</td><td>Solo se retira el li correspondiente.</td></tr><tr><td>Texto con etiquetas</td><td>Ingresar &lt;b&gt;Hola&lt;/b&gt;.</td><td>Se muestra como texto literal mediante textContent.</td></tr></tbody></table></div></section><section class="panel"><h2>II. Análisis de resultados</h2><p class="note">Pruebas en navegador: entrada vacía → 0 tareas; agregar «Estudiar HTML» → 1 tarea; agregar «Practicar JavaScript» → 2 tareas; eliminar la primera → 1 tarea y la segunda permanece visible.</p><p>Cada envío válido crea un li y su botón mediante createElement y appendChild. La función del botón conserva una referencia al li que debe eliminar, de modo que removeChild retira únicamente esa tarea. trim evita tareas vacías y textContent impide interpretar el texto ingresado como etiquetas HTML. La lista solo existe en memoria durante la visita.</p></section><section class="panel"><h2>III. Conclusiones</h2><ol><li>El DOM permite agregar y quitar tareas sin recargar la página.</li><li>Cada botón de eliminación puede actuar sobre un elemento específico mediante una referencia.</li><li>Validar espacios y utilizar textContent mejora la calidad de la entrada y evita interpretar etiquetas.</li></ol></section><section class="panel"><h2>Código de la solución</h2><p>Los archivos originales también están incluidos en la carpeta de este tema.</p><details><summary>index.html</summary><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;title&gt;Manipulación del DOM y Eventos&lt;/title&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;../assets/site.css&quot;&gt;&lt;/head&gt;&lt;body&gt;&lt;header class=&quot;hero&quot;&gt;&lt;div class=&quot;wrap&quot;&gt;&lt;a href=&quot;../index.html&quot;&gt;← Todas las guías&lt;/a&gt;&lt;p&gt;TEMA 04 · PRÁCTICA RESUELTA&lt;/p&gt;&lt;h1&gt;Manipulación del DOM y Eventos&lt;/h1&gt;&lt;div class=&quot;backlinks&quot;&gt;&lt;a href=&quot;informe.html&quot;&gt;Desarrollo y conclusiones&lt;/a&gt;&lt;a href=&quot;../guias/guia-4.pdf&quot;&gt;Guía original (PDF)&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/header&gt;&lt;main class=&quot;wrap&quot;&gt;&lt;section class=&quot;panel&quot;&gt;&lt;h2&gt;Mi lista de tareas&lt;/h2&gt;&lt;p&gt;Agrega una tarea y utiliza su botón Eliminar para retirarla. La lista se reinicia al recargar.&lt;/p&gt;&lt;form id=&quot;tareaForm&quot;&gt;&lt;label for=&quot;tareaInput&quot;&gt;Nueva tarea:&lt;/label&gt;&lt;input id=&quot;tareaInput&quot; type=&quot;text&quot; placeholder=&quot;Escribe una tarea&quot; maxlength=&quot;200&quot; autocomplete=&quot;off&quot;&gt;&lt;button id=&quot;agregarBtn&quot; type=&quot;submit&quot;&gt;Agregar&lt;/button&gt;&lt;/form&gt;&lt;p id=&quot;estado&quot; class=&quot;status&quot; role=&quot;status&quot;&gt;&lt;/p&gt;&lt;p id=&quot;contador&quot;&gt;0 tareas&lt;/p&gt;&lt;ul id=&quot;listaTareas&quot; aria-label=&quot;Lista de tareas&quot;&gt;&lt;/ul&gt;&lt;/section&gt;&lt;/main&gt;&lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;&lt;footer&gt;Laboratorio de Programación Web · Solución de referencia&lt;/footer&gt;&lt;/body&gt;&lt;/html&gt;</code></pre></details><details><summary>app.js</summary><pre><code>const input = document.getElementById(&#x27;tareaInput&#x27;);
+const boton = document.getElementById(&#x27;agregarBtn&#x27;);
+const lista = document.getElementById(&#x27;listaTareas&#x27;);
+const estado = document.getElementById(&#x27;estado&#x27;);
+function actualizarContador() {
+  const total = lista.children.length;
+  document.getElementById(&#x27;contador&#x27;).textContent = total + (total === 1 ? &#x27; tarea&#x27; : &#x27; tareas&#x27;);
+}
+document.getElementById(&#x27;tareaForm&#x27;).addEventListener(&#x27;submit&#x27;, function(event) {
+  event.preventDefault();
+  const textoTarea = input.value.trim();
+  if (!textoTarea) { estado.textContent = &#x27;Escribe una tarea antes de agregarla.&#x27;; input.focus(); return; }
+  const nuevaTarea = document.createElement(&#x27;li&#x27;);
+  const texto = document.createElement(&#x27;span&#x27;);
+  texto.textContent = textoTarea; // Se trata como texto, nunca como HTML ejecutable.
+  const btnEliminar = document.createElement(&#x27;button&#x27;);
+  btnEliminar.type = &#x27;button&#x27;;
+  btnEliminar.textContent = &#x27;Eliminar&#x27;;
+  btnEliminar.setAttribute(&#x27;aria-label&#x27;, &#x27;Eliminar tarea: &#x27; + textoTarea);
+  nuevaTarea.appendChild(texto);
+  nuevaTarea.appendChild(btnEliminar);
+  lista.appendChild(nuevaTarea);
+  input.value = &#x27;&#x27;;
+  estado.textContent = &#x27;Tarea agregada: &#x27; + textoTarea;
+  actualizarContador(); input.focus();
+  btnEliminar.addEventListener(&#x27;click&#x27;, function() {
+    lista.removeChild(nuevaTarea);
+    estado.textContent = &#x27;Tarea eliminada: &#x27; + textoTarea;
+    actualizarContador(); input.focus();
+  });
+});
+</code></pre></details></section></main><footer>Laboratorio de Programación Web · Solución de referencia</footer></body></html>
