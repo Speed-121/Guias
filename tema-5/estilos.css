@@ -1,0 +1,6 @@
+/* Se carga después de Bootstrap para personalizar sin modificar el framework. */
+body { background-color: #f5f5f5; }
+.card { box-shadow: 0 4px 6px rgba(0,0,0,.1); max-width: 24rem; }
+.navbar button { margin-top: 0; }
+.navbar .nav-link { color: #e3eaf0; }
+form .form-control { max-width: 100%; }
